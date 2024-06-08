@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #player, .enemy {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+        }
+        #player {
+            background: blue;
+        }
+        .enemy {
+            background: red;
+        }
+        #gameover, #start {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="player"></div>
+    <div class="enemy"></div>
+    <div class="enemy"></div>
+    <div id="gameover">GameOver</div>
+    <div id="start">Click to start</div>
+
+    <script>
+        var player = document.getElementById('player');
+        var enemies = document.querySelectorAll('.enemy');
+        var gameover = document.getElementById('gameover');
+        var start = document.getElementById('start');
+
+        var playerPos = { x: 0, y: 0 };
+        var enemyPos = [{ x: 200, y: 200 }, { x: 300, y: 300 }];
+        var gameInterval;
+
+        function updatePositions() {
+            player.style.left = playerPos.x + 'px';
+            player.style.top = playerPos.y + 'px';
+            enemies.forEach(function(enemy, index) {
+                enemy.style.left = enemyPos[index].x + 'px';
+                enemy.style.top = enemyPos[index].y + 'px';
+            });
+        }
+
+        function moveEnemy() {
+            enemies.forEach(function(enemy, index) {
+                var dx = playerPos.x - enemyPos[index].x;
+                var dy = playerPos.y - enemyPos[index].y;
+                var dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 50) {
+                    gameover.style.display = 'block';
+                    clearInterval(gameInterval);
+                    return;
+                }
+
+                if (dist > 1) {
+                    dx /= dist;
+                    dy /= dist;
+                }
+
+                enemyPos[index].x += dx;
+                enemyPos[index].y += dy;
+            });
+            updatePositions();
+        }
+
+        window.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowUp': playerPos.y -= 10; break;
+                case 'ArrowDown': playerPos.y += 10; break;
+                case 'ArrowLeft': playerPos.x -= 10; break;
+                case 'ArrowRight': playerPos.x += 10; break;
+            }
+            updatePositions();
+        });
+
+        start.style.display = 'block';
+        start.addEventListener('click', function() {
+            start.style.display = 'none';
+            gameInterval = setInterval(moveEnemy, 100);
+        });
+    </script>
+</body>
+</html>
